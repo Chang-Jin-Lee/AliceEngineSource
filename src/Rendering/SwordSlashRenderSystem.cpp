@@ -1,5 +1,5 @@
 #include "Rendering/SwordSlashRenderSystem.h"
-#include "../../../Assets/Scripts/SwordSlashEffect.h"
+#include "../../Assets/Scripts/SwordSlashEffect.h"
 
 #include <d3dcompiler.h>
 #include <cmath>

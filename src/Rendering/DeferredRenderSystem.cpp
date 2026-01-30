@@ -1701,7 +1701,7 @@ namespace Alice
         for (const auto& [id, tr] : transforms)
         {
             if (cameraEntities.contains(id)) continue;
-            if (!tr.enabled) continue;
+            if (!tr.enabled || !tr.visible) continue;
             hasObjects = true;
             minP.x = (std::min)(minP.x, tr.position.x); minP.y = (std::min)(minP.y, tr.position.y); minP.z = (std::min)(minP.z, tr.position.z);
             maxP.x = (std::max)(maxP.x, tr.position.x); maxP.y = (std::max)(maxP.y, tr.position.y); maxP.z = (std::max)(maxP.z, tr.position.z);
@@ -1815,7 +1815,7 @@ namespace Alice
             {
                 if (cameraEntities.contains(id)) continue;
                 if (world.GetComponent<SkinnedMeshComponent>(id)) continue;
-                if (!tr.enabled) continue;
+                if (!tr.enabled || !tr.visible) continue;
 
                 // [프러스텀 컬링] 카메라 시야 밖 오브젝트는 건너뛰기
                 float maxScale = std::max({ tr.scale.x, tr.scale.y, tr.scale.z });
@@ -2420,7 +2420,7 @@ namespace Alice
         {
             if (cameraEntities.contains(id)) continue;
             if (world.GetComponent<SkinnedMeshComponent>(id)) continue;
-            if (!transform.enabled) continue;
+            if (!transform.enabled || !transform.visible) continue;
 
             // [프러스텀 컬링] 카메라 시야 밖 오브젝트는 건너뛰기
             float maxScale = std::max({ transform.scale.x, transform.scale.y, transform.scale.z });
@@ -2449,7 +2449,7 @@ namespace Alice
             
             const MaterialComponent* mat = world.GetComponent<MaterialComponent>(id);
             if (mat) {
-                color = { mat->color.x, mat->color.y, mat->color.z, 1.0f };
+                color = { mat->color.x, mat->color.y, mat->color.z, mat->alpha };
                 rough = mat->roughness; 
                 metal = mat->metalness;
                 if (mat->shadingMode >= 0)
@@ -2656,7 +2656,7 @@ namespace Alice
                     continue; // 화면에 보이지 않으면 렌더링하지 않음
                 }
 
-                const XMFLOAT4 color(cmd.color.x, cmd.color.y, cmd.color.z, 1.0f);
+                const XMFLOAT4 color(cmd.color.x, cmd.color.y, cmd.color.z, cmd.alpha);
                 const int objectShadingMode = (cmd.shadingMode >= 0) ? cmd.shadingMode : shadingMode;
                 const float ao = (cmd.shadingMode >= 0) ? cmd.ambientOcclusion : m_lightingParameters.ambientOcclusion;
 
@@ -3176,7 +3176,7 @@ namespace Alice
                 continue; // 화면에 보이지 않으면 렌더링하지 않음
             }
 
-            const DirectX::XMFLOAT4 color(cmd.color.x, cmd.color.y, cmd.color.z, 1.0f);
+            const DirectX::XMFLOAT4 color(cmd.color.x, cmd.color.y, cmd.color.z, cmd.alpha);
             const int objectShadingMode = (cmd.shadingMode >= 0) ? cmd.shadingMode : shadingMode;
             const float ao = (cmd.shadingMode >= 0) ? cmd.ambientOcclusion : m_lightingParameters.ambientOcclusion;
             const float outlineWidth = cmd.outlineWidth;
@@ -3714,7 +3714,7 @@ namespace Alice
             if (!light.enabled) continue;
             if (data.pointCount >= MaxPointLights) break;
             const auto* tr = world.GetComponent<TransformComponent>(id);
-            if (!tr || !tr->enabled) continue;
+            if (!tr || !tr->enabled || !tr->visible) continue;
 
             auto& dst = data.pointLights[data.pointCount++];
             dst.position = tr->position;
@@ -3729,7 +3729,7 @@ namespace Alice
             if (!light.enabled) continue;
             if (data.spotCount >= MaxSpotLights) break;
             const auto* tr = world.GetComponent<TransformComponent>(id);
-            if (!tr || !tr->enabled) continue;
+            if (!tr || !tr->enabled || !tr->visible) continue;
 
             XMVECTOR forward = XMVectorSet(0, 0, 1, 0);
             XMMATRIX rot = XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(&tr->rotation));
@@ -3756,7 +3756,7 @@ namespace Alice
             if (!light.enabled) continue;
             if (data.rectCount >= MaxRectLights) break;
             const auto* tr = world.GetComponent<TransformComponent>(id);
-            if (!tr || !tr->enabled) continue;
+            if (!tr || !tr->enabled || !tr->visible) continue;
 
             XMVECTOR forward = XMVectorSet(0, 0, 1, 0);
             XMMATRIX rot = XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(&tr->rotation));
